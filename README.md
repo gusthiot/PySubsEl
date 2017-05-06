@@ -5,8 +5,6 @@
 - dans une fenêtre de commande ou un terminal, taper<pre>
   pip install -r requirements.txt</pre>
 - lancer main.py et choisir un dossier de travail qui contient des csv de données brutes
-OU
-- lancer test.py et travailler avec le dossier test et les fichiers qui s'y trouvent
 
 Le dossier 'importes' contient les classes servant à l'importation des données contenues dans les csv et au traitement 
 de base de ces données
