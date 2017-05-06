@@ -2,7 +2,6 @@
 
 - installer Python 3 (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
-- installer TeX Live (https://www.tug.org/texlive/)
 - dans une fenêtre de commande ou un terminal, taper<pre>
   pip install -r requirements.txt</pre>
 - lancer main.py et choisir un dossier de travail qui contient des csv de données brutes
