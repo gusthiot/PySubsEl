@@ -7,7 +7,7 @@ class SubCompte(SubFichier):
     Classe pour l'importation des données Comptes de Subsides
     """
 
-    cles = ['id_compte', 'nature', 'type_compte', 'type_subside']
+    cles = ['id_compte', 'nature', 'type_compte', 'type_subside', 'intitule']
     nom_fichier = "cptesubside.csv"
     libelle = "Comptes Subsides"
 
@@ -26,6 +26,18 @@ class SubCompte(SubFichier):
             Outils.affiche_message(info)
             return []
         return self.ids
+
+    # def obtenir_ids(self, nature_client, ):
+    #     """
+    #     retourne les ids de tous les comptes
+    #     :return: ids de tous les comptes
+    #     """
+    #     if self.verifie_coherence == 0:
+    #         info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les ids"
+    #         print(info)
+    #         Outils.affiche_message(info)
+    #         return []
+    #     return self.ids
 
     def est_coherent(self, subgeneraux):
         """

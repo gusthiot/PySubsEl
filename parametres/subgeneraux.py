@@ -5,6 +5,8 @@ from collections import namedtuple
 _champs_article = ["indice_d", "code_d", "intitule_long", "intitule_court"]
 Article = namedtuple("Article", _champs_article)
 
+_champs_article_t = ["indice_t", "code_t", "texte_t_long", "texte_t_court"]
+Article_t = namedtuple("Article_t", _champs_article_t)
 
 class SubGeneraux(object):
     """
@@ -13,8 +15,8 @@ class SubGeneraux(object):
 
     nom_fichier = "s-paramgen.csv"
     libelle = "Paramètres Généraux"
-    cles = ['financier', 'fonds', 'lien', 'lecture', 'sauvegarde', 'indice_t', 'code_t', 'code_n', 'indice_d', 'code_d',
-            'intitule_long', 'intitule_court']
+    cles = ['financier', 'fonds', 'lien', 'lecture', 'sauvegarde', 'indice_t', 'code_t', 'texte_t_long',
+            'texte_t_court', 'code_n', 'indice_d', 'code_d', 'intitule_long', 'intitule_court']
 
     def __init__(self, dossier_source):
         """
@@ -29,8 +31,8 @@ class SubGeneraux(object):
                 if cle not in self.cles:
                     Outils.fatal(ErreurConsistance(),
                                  "Clé inconnue dans %s: %s" % (self.nom_fichier, cle))
-                while "" in ligne:
-                    ligne.remove("")
+                while ligne[-1] == "":
+                    del ligne[-1]
                 self._donnees[cle] = ligne
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : "+SubGeneraux.nom_fichier)
@@ -62,8 +64,14 @@ class SubGeneraux(object):
         if (len(self._donnees['code_d']) != len(self._donnees['indice_d'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['intitule_long'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['intitule_court'])):
-            erreurs += "le nombre de colonees doit être le même pour le code D, l'indice D, l'intitulé long" \
+            erreurs += "le nombre de colonnes doit être le même pour le code D, l'indice D, l'intitulé long" \
                        " et l'intitulé court\n"
+
+        if (len(self._donnees['code_t']) != len(self._donnees['indice_t'])) or \
+                (len(self._donnees['code_t']) != len(self._donnees['texte_t_long'])) or \
+                (len(self._donnees['code_t']) != len(self._donnees['texte_t_court'])):
+            erreurs += "le nombre de colonnes doit être le même pour le code T, l'indice T, le texte T long" \
+                       " et le texte T court\n"
 
         if erreurs != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + erreurs)
@@ -86,9 +94,6 @@ class SubGeneraux(object):
     def articles(self):
         """renvoie la liste des articles de facturation.
 
-        Le premier (coûts procédés machines)
-        s'appelle "D2"; les suivants (en nombre variable) s'appellent "D3".
-
         :return: une liste ordonnée d'objets Article
         """
         if not hasattr(self, "_articles"):
@@ -99,16 +104,49 @@ class SubGeneraux(object):
         return self._articles
 
     @property
+    def articles_t(self):
+        """renvoie la liste des types de subsides.
+
+        :return: une liste ordonnée d'objets Article
+        """
+        if not hasattr(self, "_articles_t"):
+            self._articles_t = []
+            for i in range(1, len(self._donnees['code_t'])):
+                kw = dict((k, self._donnees[k][i]) for k in _champs_article_t)
+                self._articles_t.append(Article_t(**kw))
+        return self._articles_t
+
+    @property
     def articles_d3(self):
         """
         retourne uniquement les articles D3
 
         :return: une liste ordonnée d'objets Article
         """
-        return self.articles[1:]
+        articles_d3 = []
+        for a in self.articles:
+            if a.indice_d == '3':
+                articles_d3.append(a)
+        return articles_d3
 
     def codes_d3(self):
         return [a.code_d for a in self.articles_d3]
+
+    @property
+    def articles_t3(self):
+        """
+        retourne uniquement les articles T3
+
+        :return: une liste ordonnée d'objets Article
+        """
+        articles_t3 = []
+        for a in self.articles_t:
+            if a.indice_t == '3':
+                articles_t3.append(a)
+        return articles_t3
+
+    def codes_t3(self):
+        return [a.code_t for a in self.articles_t3]
 
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:
