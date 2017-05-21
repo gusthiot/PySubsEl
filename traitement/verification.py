@@ -1,5 +1,3 @@
-from outils import Outils
-
 
 class Verification(object):
     """
@@ -24,7 +22,7 @@ class Verification(object):
         self.a_verifier = 1
         return verif
 
-    def verification_coherence(self, subgeneraux, subcomptes, submachines, subprestations, bilans):
+    def verification_coherence(self, subgeneraux, subcomptes, submachines, subprestations, bilans, subsides):
         """
         vérifie la cohérence des données importées
         :param subgeneraux: paramètres généraux
@@ -39,41 +37,7 @@ class Verification(object):
         verif += subcomptes.est_coherent(subgeneraux)
         verif += submachines.est_coherent(subcomptes)
         verif += subprestations.est_coherent(subgeneraux, subcomptes)
-        verif += self.coherence_bilans(bilans)
+        verif += subsides.coherence_bilans(bilans, subcomptes)
         self.a_verifier = 0
         return verif
 
-    def coherence_bilans(self, bilans):
-        coherence_clients = 0
-        coherence_comptes = 0
-        clients = {}
-
-        for bilan in bilans:
-            for donnee in bilan.donnees:
-                client = donnee[bilan.cles['code client']]
-                nature = donnee[bilan.cles['nature client']]
-                type = donnee[bilan.cles['type client']]
-                abrev = donnee[bilan.cles['abrév. labo']]
-                compte = donnee[bilan.cles['id-compte']]
-                numero = donnee[bilan.cles['numéro compte']]
-                intitule = donnee[bilan.cles['intitulé compte']]
-                code_type = donnee[bilan.cles['code type compte']]
-                if client not in clients:
-                    clients[client] = {'comptes': {}, 'nature': nature, 'type': type, 'abrev': abrev, 'coherent': True}
-                else:
-                    if nature != clients[client]['nature']:
-                        clients[client]['coherent'] = False
-                        coherence_clients +=1
-                    if type != clients[client]['type']:
-                        clients[client]['coherent'] = False
-                        coherence_clients += 1
-
-        if coherence_clients > 0:
-            msg = "Les clients suivants ne sont pas homogènes sur la période, " \
-                  "soit pour la nature du client soit pour le type du client : \n"
-            for client in clients.keys():
-                if not clients[client]['coherent']:
-                    msg += " - " + client + "/" + clients[client]['abrev'] + "\n"
-            Outils.affiche_message(msg)
-
-        return coherence_clients + coherence_comptes

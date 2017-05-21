@@ -18,11 +18,12 @@ from docopt import docopt
 from importes import (SubPrestation,
                       SubCompte,
                       DossierSource,
+                      Bilan,
                       SubMachine)
 from parametres import (SubEdition,
                         SubGeneraux)
 from traitement import (Verification,
-                        Bilan)
+                        Subside)
 from outils import Outils
 
 arguments = docopt(__doc__)
@@ -70,9 +71,10 @@ while 1:
         annee += 1
 
 verification = Verification()
+subsides = Subside()
 if verification.verification_date(bilans) > 0:
     sys.exit("Erreur dans les dates")
-if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans) > 0:
+if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans, subsides) > 0:
     sys.exit("Erreur dans la cohérence")
 
 Outils.affiche_message("OK !!!")

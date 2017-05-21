@@ -27,17 +27,16 @@ class SubCompte(SubFichier):
             return []
         return self.ids
 
-    # def obtenir_ids(self, nature_client, ):
-    #     """
-    #     retourne les ids de tous les comptes
-    #     :return: ids de tous les comptes
-    #     """
-    #     if self.verifie_coherence == 0:
-    #         info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les ids"
-    #         print(info)
-    #         Outils.affiche_message(info)
-    #         return []
-    #     return self.ids
+    def obtenir_id(self, nature, type_compte):
+        if self.verifie_coherence == 0:
+            info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les ids"
+            print(info)
+            Outils.affiche_message(info)
+            return None
+        for k, v in self.donnees.items():
+            if v['nature'] == nature and v['type_compte'] == type_compte:
+                return k
+        return None
 
     def est_coherent(self, subgeneraux):
         """
