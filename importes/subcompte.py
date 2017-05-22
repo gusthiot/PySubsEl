@@ -13,7 +13,7 @@ class SubCompte(SubFichier):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ids = []
+        self._ids = []
 
     def obtenir_ids(self):
         """
@@ -25,9 +25,15 @@ class SubCompte(SubFichier):
             print(info)
             Outils.affiche_message(info)
             return []
-        return self.ids
+        return self._ids
 
     def obtenir_id(self, nature, type_compte):
+        """
+        obtenir l'id subsides compte pour un type de compte et une nature client, s'il existe
+        :param nature: nature client
+        :param type_compte: type de compte
+        :return: id subise compte s'il existe, ou None
+        """
         if self.verifie_coherence == 0:
             info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les ids"
             print(info)
@@ -57,8 +63,8 @@ class SubCompte(SubFichier):
 
             if donnee['id_compte'] == "":
                 msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_compte'] not in self.ids:
-                self.ids.append(donnee['id_compte'])
+            elif donnee['id_compte'] not in self._ids:
+                self._ids.append(donnee['id_compte'])
             else:
                 msg += "le compte id '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"

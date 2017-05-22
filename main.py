@@ -19,11 +19,12 @@ from importes import (SubPrestation,
                       SubCompte,
                       DossierSource,
                       Bilan,
+                      Force,
                       SubMachine)
 from parametres import (SubEdition,
                         SubGeneraux)
 from traitement import (Verification,
-                        Subside)
+                        Consolidation)
 from outils import Outils
 
 arguments = docopt(__doc__)
@@ -45,6 +46,11 @@ subgeneraux = SubGeneraux(dossier_source)
 subcomptes = SubCompte(dossier_source)
 submachines = SubMachine(dossier_source)
 subprestations = SubPrestation(dossier_source)
+
+chemin_force = Outils.chemin([dossier_data, Force.nom_fichier], plateforme)
+force = None
+if Outils.existe(chemin_force):
+    force = Force(dossier_source)
 
 dossier_bilans = subgeneraux.lecture
 mois = subedition.mois_debut
@@ -71,10 +77,11 @@ while 1:
         annee += 1
 
 verification = Verification()
-subsides = Subside()
+consolidation = Consolidation()
 if verification.verification_date(bilans) > 0:
     sys.exit("Erreur dans les dates")
-if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans, subsides) > 0:
+if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans, consolidation,
+                                       force) > 0:
     sys.exit("Erreur dans la cohérence")
 
 Outils.affiche_message("OK !!!")
