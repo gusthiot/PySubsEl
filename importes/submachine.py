@@ -41,6 +41,12 @@ class SubMachine(SubFichier):
                 msg += "le compte id '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
                        " n'est pas référencée dans les comptes subisdes\n"
 
+            donnee['max_ma'], info = Outils.est_un_nombre(donnee['max_ma'], "le maximum ma", ligne)
+            msg += info
+
+            donnee['max_mo'], info = Outils.est_un_nombre(donnee['max_mo'], "le maximum mo", ligne)
+            msg += info
+
             donnees_dict[donnee['id_compte']] = donnee
 
             ligne += 1

@@ -24,8 +24,10 @@ from importes import (SubPrestation,
 from parametres import (SubEdition,
                         SubGeneraux)
 from traitement import (Verification,
+                        Annexes,
                         Consolidation)
 from outils import Outils
+from latex import Latex
 
 arguments = docopt(__doc__)
 
@@ -83,5 +85,12 @@ if verification.verification_date(bilans) > 0:
 if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans, consolidation,
                                        force) > 0:
     sys.exit("Erreur dans la cohérence")
+
+consolidation.calcul_sommes(subgeneraux, submachines, subprestations)
+dossier_enregistrement = Outils.chemin([subgeneraux.sauvegarde, annee, Outils.mois_string(mois)], plateforme)
+dossier_annexes = Outils.chemin([dossier_enregistrement, "annexes"], plateforme, subgeneraux)
+Outils.existe(dossier_annexes, True)
+if Latex.possibles():
+    Annexes.annexes(consolidation, plateforme, subgeneraux, subedition, dossier_annexes)
 
 Outils.affiche_message("OK !!!")

@@ -50,6 +50,9 @@ class SubPrestation(SubFichier):
                     msg += "Couple categorie '" + donnee['categorie'] + "' et compte id '" + \
                            donnee['id_compte'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
+            donnee['max'], info = Outils.est_un_nombre(donnee['max'], "le maximum", ligne)
+            msg += info
+
             donnees_dict[donnee['id_compte'] + donnee['categorie']] = donnee
             ligne += 1
 

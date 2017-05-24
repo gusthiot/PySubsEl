@@ -1,10 +1,7 @@
 from tkinter.filedialog import *
 from tkinter.scrolledtext import *
 
-import shutil
-import errno
 import os
-import platform
 
 from erreurs import ErreurConsistance
 
@@ -13,27 +10,6 @@ class Outils(object):
     """
     Classe contenant diverses méthodes utiles
     """
-    @staticmethod
-    def copier_dossier(source, dossier, destination):
-        """
-        copier un dossier
-        :param source: chemin du dossier à copier
-        :param dossier: dossier à copier
-        :param destination: chemin de destination de copie
-        """
-        chemin = destination + "/" + dossier
-        if not os.path.exists(chemin):
-            try:
-                shutil.copytree(source + dossier, chemin)
-            except OSError as exc:
-                if exc.errno == errno.ENOTDIR:
-                    shutil.copy(source, destination)
-
-    if platform.system() in ['Linux', 'Darwin']:
-        _interface_graphique = len(os.environ.get('DISPLAY', '')) > 0
-    else:
-        _interface_graphique = True
-
     @classmethod
     def interface_graphique(cls, opt_nouvelle_valeur=None):
         """
@@ -77,23 +53,6 @@ class Outils(object):
             sys.exit(4)            
 
     @staticmethod
-    def affiche_message_conditionnel(message):
-        """
-        affiche une petite boite de dialogue avec un message et 2 boutons OUI/NON, le NON arrête le programme
-        :param message: message à afficher
-        """
-        fenetre = Tk()
-        fenetre.title("Message conditionnel")
-        texte = ScrolledText(fenetre)
-        texte.insert(END, message)
-        texte.pack()
-        button = Button(fenetre, text='OUI', command=fenetre.destroy)
-        button.pack(side="left")
-        button = Button(fenetre, text='NON', command=sys.exit)
-        button.pack(side="right")
-        mainloop()
-
-    @staticmethod
     def choisir_dossier(plateforme):
         """
         affiche une interface permettant de choisir un dossier
@@ -109,27 +68,6 @@ class Outils(object):
             Outils.affiche_message("Aucun dossier choisi")
             sys.exit("Aucun dossier choisi")
         return dossier + Outils.separateur_os(plateforme)
-
-    @staticmethod
-    def format_heure(nombre):
-        """
-        transforme une heure d'un format float à un format hh:mm
-        :param nombre: heure en float
-        :return: heure en hh:mm
-        """
-        if nombre == 0:
-            return "00:00"
-        signe = ""
-        if nombre < 0:
-            signe = "-"
-        nombre = abs(nombre)
-        heures = "%d" % (nombre // 60)
-        if (nombre // 60) < 10:
-            heures = '0' + heures
-        minutes = "%d" % (nombre % 60)
-        if (nombre % 60) < 10:
-            minutes = '0' + minutes
-        return signe + heures + ':' + minutes
 
     @staticmethod
     def mois_string(mois):
@@ -179,8 +117,8 @@ class Outils(object):
         :param generaux: paramètres généraux
         :return: séparateur, string
         """
-        if "\\" in generaux.chemin:
-            if "/" in generaux.chemin:
+        if "\\" in generaux.sauvegarde:
+            if "/" in generaux.sauvegarde:
                 Outils.affiche_message("'/' et '\\' présents dans le lien des paramètres généraux !!! ")
             texte = texte.replace("/", "\\")
             """
@@ -231,38 +169,6 @@ class Outils(object):
             return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
 
     @staticmethod
-    def renommer_dossier(ancienne_structure, nouvelle_structure, plateforme):
-        """
-        renomme un dossier
-        :param ancienne_structure: éléments de l'ancien nom de dossier
-        :param nouvelle_structure: éléments du nouveau nom de dossier
-        :param plateforme: OS utilisé
-        """
-        ancien_chemin = ""
-        for element in ancienne_structure:
-            ancien_chemin += str(element) + Outils.separateur_os(plateforme)
-        nouveau_chemin = ""
-        for element in nouvelle_structure:
-            nouveau_chemin += str(element) + Outils.separateur_os(plateforme)
-        os.rename(ancien_chemin, nouveau_chemin)
-
-    @staticmethod
-    def effacer_fichier(chemin):
-        """
-        efface un fichier
-        :param chemin: chemin du fichier
-        """
-        os.remove(chemin)
-
-    @staticmethod
-    def effacer_dossier(chemin):
-        """
-        efface un dossier
-        :param chemin: chemin du dossier
-        """
-        shutil.rmtree(chemin)
-
-    @staticmethod
     def existe(chemin, creation=False):
         """
         vérifie si le dossier/fichier existe
@@ -292,21 +198,6 @@ class Outils(object):
         return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, generaux))
 
     @staticmethod
-    def est_un_nombre(donnee, colonne, ligne):
-        """
-        vérifie que la donnée est bien un nombre
-        :param donnee: donnée à vérifier
-        :param colonne: colonne contenant la donnée
-        :param ligne: ligne contenant la donnée
-        :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
-        """
-        try:
-            fl_d = float(donnee)
-            return fl_d, ""
-        except ValueError:
-            return 0, colonne + " de la ligne " + str(ligne) + " doit être un nombre\n"
-
-    @staticmethod
     def format_2_dec(nombre):
         """
         affiche un nombre en float arrondi avec 2 chiffres après la virgule
@@ -320,64 +211,16 @@ class Outils(object):
             return "pas un nombre"
 
     @staticmethod
-    def utilisateurs_in_somme(somme, users):
+    def est_un_nombre(donnee, colonne, ligne):
         """
-        création de la liste des utilisateurs présents dans une somme
-        :param somme: somme concernée
-        :param users: données users
-        :return: liste d'utilisateurs triée par nom, puis par prénom
+        vérifie que la donnée est bien un nombre
+        :param donnee: donnée à vérifier
+        :param colonne: colonne contenant la donnée
+        :param ligne: ligne contenant la donnée
+        :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
         """
-        utilisateurs = {}
-        for key in somme:
-            prenom = users.donnees[key]['prenom']
-            nom = users.donnees[key]['nom']
-            if nom not in utilisateurs:
-                utilisateurs[nom] = {}
-            if prenom not in utilisateurs[nom]:
-                utilisateurs[nom][prenom] = []
-            utilisateurs[nom][prenom].append(key)
-
-        return utilisateurs
-
-    @staticmethod
-    def machines_in_somme(somme, machines):
-        """
-        création de la liste des machines présentes dans une somme
-        :param somme: somme concernée
-        :param machines: données machines
-        :return: liste de machines triée par id_cout, puis par nom
-        """
-        machines_utilisees = {}
-        for key in somme:
-            id_cout = machines.donnees[key]['id_cout']
-            nom = machines.donnees[key]['nom']
-            if id_cout not in machines_utilisees:
-                machines_utilisees[id_cout] = {}
-            machines_utilisees[id_cout][nom] = key
-
-        return machines_utilisees
-
-    @staticmethod
-    def comptes_in_somme(somme, comptes):
-        """
-        création de la liste des comptes présents dans une somme
-        :param somme: somme concernée
-        :param comptes: données comptes
-        :return: liste de comptes, triée par numéro
-        """
-        comptes_utilises = {}
-        max_size = 0
-        for key in somme:
-            numero = comptes.donnees[key]['numero']
-            if len(numero) > max_size:
-                max_size = len(numero)
-
-        for key in somme:
-            numero = comptes.donnees[key]['numero']
-            num = numero
-            for dif in range(len(numero), max_size):
-                num = '0' + num
-            if num not in comptes_utilises:
-                comptes_utilises[num] = key
-
-        return comptes_utilises
+        try:
+            fl_d = float(donnee)
+            return fl_d, ""
+        except ValueError:
+            return 0, colonne + " de la ligne " + str(ligne) + " doit être un nombre\n"

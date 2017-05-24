@@ -145,8 +145,20 @@ class SubGeneraux(object):
                 articles_t3.append(a)
         return articles_t3
 
+    def article_t3(self, code):
+        """
+        retourne l'articles T3 pour le code donné
+
+        :return: un objet Article or None
+        """
+        for a in self.articles_t:
+            if a.indice_t == '3' and a.code_t == code:
+                return a
+        return None
+
     def codes_t3(self):
         return [a.code_t for a in self.articles_t3]
+
 
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:
