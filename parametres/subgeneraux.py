@@ -145,14 +145,14 @@ class SubGeneraux(object):
                 articles_t3.append(a)
         return articles_t3
 
-    def article_t3(self, code):
+    def article_t(self, code):
         """
         retourne l'articles T3 pour le code donné
 
         :return: un objet Article or None
         """
         for a in self.articles_t:
-            if a.indice_t == '3' and a.code_t == code:
+            if a.code_t == code:
                 return a
         return None
 

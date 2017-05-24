@@ -80,13 +80,14 @@ class Annexes(object):
             # ## COMPTE
 
             # ## ligne 3
-            dico_recap_compte = {'numero': num_compte, 'intitule': compte['intitule'], 'code': compte['id_sub'],
-                                 'type_s': compte['type_s'], 'type_p': compte['type_p'],
-                                 'montant': Outils.format_2_dec(compte['subs'])}
-            contenu_recap_compte += r'''
-                %(numero)s & %(intitule)s & %(code)s & %(type_s)s & %(type_p)s & %(montant)s \\
-                \hline
-                  ''' % dico_recap_compte
+            if compte['subs'] > 0:
+                dico_recap_compte = {'numero': num_compte, 'intitule': compte['intitule'], 'code': compte['id_sub'],
+                                     'type_s': compte['type_s'], 'type_p': compte['type_p'],
+                                     'montant': Outils.format_2_dec(compte['subs'])}
+                contenu_recap_compte += r'''
+                    %(numero)s & %(intitule)s & %(code)s & %(type_s)s & %(type_p)s & %(montant)s \\
+                    \hline
+                      ''' % dico_recap_compte
 
             # ## 4
 
@@ -94,7 +95,7 @@ class Annexes(object):
                                   'intitule': compte['intitule'], 'type': compte['type']}
             if inc_4 > 0:
                 contenu_detail_compte += r'''
-                    \multicolumn{%(taille)s}{c}{} \\
+                    \multicolumn{%(taille)s}{c}{} \\ \noalign{\penalty-5000}
                       ''' % dico_detail_compte
             else:
                 inc_4 = 1
@@ -145,9 +146,41 @@ class Annexes(object):
                                   'subs': Outils.format_2_dec(compte['subs'])}
             contenu_detail_compte += r'''\\*
                 \hline
-                \multicolumn{%(taille)s}{|r|}{%(subs)s} \\
+                \multicolumn{%(taille)s}{|r|}{%(subs)s} \\ 
                 \hline
                 ''' % dico_detail_compte
+
+        # ## 2
+
+        if client['bonus'] > 0:
+            structure_bonus = r'''{|c|c|c|c|}'''
+            contenu_bonus = r'''
+                \hline
+                Année & Mois & Code & Montant \\
+                \hline
+                '''
+
+            for a, annee in sorted(client['annees'].items()):
+                for m, mois in sorted(annee['mois'].items()):
+                    code = subgeneraux.article_t('B').texte_t_court
+                    dico = {'annee': a, 'mois': m, 'bj': mois['bj'],
+                            'code': code}
+                    contenu_bonus += r'''
+                        %(annee)s & %(mois)s & %(code)s & %(bj)s \\
+                        \hline
+                        ''' % dico
+
+            contenu_bonus += r'''
+                \multicolumn{3}{|r|}{TOTAL} & ''' + str(client['bonus']) + r''' \\
+                \hline
+                '''
+
+            legende_bonus = r'''Table 2 - Bonus d'utilisation en heures creuses'''
+
+            contenu += Latex.tableau(contenu_bonus, structure_bonus, legende_bonus)
+        else:
+            contenu += Latex.tableau_vide(r'''Table 2 - Pas de bonus d'utilisation en heures creuses''')
+
 
         # ## 3
 
