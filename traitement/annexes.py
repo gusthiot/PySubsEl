@@ -10,6 +10,11 @@ class Annexes(object):
     def annexes(consolidation, plateforme, subgeneraux, subedition, dossier_annexe):
         """
         création des annexes de subsides
+        :param consolidation: classe de consolidation des données des bilans
+        :param plateforme: OS utilisé
+        :param subgeneraux: paramètres généraux
+        :param subedition: paramètres d'édition
+        :param dossier_annexe: nom du dossier dans lequel enregistrer le dossier des annexes
         """
         for code_client, dcl in consolidation.clients.items():
             code_client = Latex.echappe_caracteres(code_client)
@@ -79,6 +84,9 @@ class Annexes(object):
         """
         création du contenu de l'annexe pour un client
         :param code_client: code du client pour l'annexe
+        :param consolidation: classe de consolidation des données des bilans
+        :param subgeneraux: paramètres généraux
+        :param subedition: paramètres d'édition
         """
 
         contenu = ""
@@ -117,7 +125,7 @@ class Annexes(object):
                     \hline
                       ''' % dico_recap_compte
 
-            # ## 4
+            # ## partie 4
 
             dico_detail_compte = {'taille': (4 + taille_d3), 'numero': num_compte,
                                   'intitule': Latex.echappe_caracteres(compte['intitule']),

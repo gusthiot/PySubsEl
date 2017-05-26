@@ -18,6 +18,7 @@ from docopt import docopt
 from importes import (SubPrestation,
                       SubCompte,
                       DossierSource,
+                      DossierDestination,
                       Bilan,
                       Force,
                       SubMachine)
@@ -25,6 +26,8 @@ from parametres import (SubEdition,
                         SubGeneraux)
 from traitement import (Verification,
                         Annexes,
+                        BilanMensuel,
+                        BilanComptes,
                         Consolidation)
 from outils import Outils
 from latex import Latex
@@ -92,5 +95,11 @@ dossier_annexes = Outils.chemin([dossier_enregistrement, "annexes"], plateforme,
 Outils.existe(dossier_annexes, True)
 if Latex.possibles():
     Annexes.annexes(consolidation, plateforme, subgeneraux, subedition, dossier_annexes)
+
+dossier_destination = DossierDestination(dossier_enregistrement)
+bm_lignes = BilanMensuel.creation_lignes(subedition, subgeneraux, consolidation)
+BilanMensuel.bilan(dossier_destination, subedition, subgeneraux, bm_lignes)
+bc_lignes = BilanComptes.creation_lignes(subedition, subgeneraux, consolidation)
+BilanComptes.bilan(dossier_destination, subedition, subgeneraux, bc_lignes)
 
 Outils.affiche_message("OK !!!")

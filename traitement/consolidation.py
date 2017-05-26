@@ -131,6 +131,10 @@ class Consolidation(object):
             client['subs'] = 0
             client['bonus'] = 0
             client['codes'] = {}
+            client['subs_ma'] = 0
+            client['subs_mo'] = 0
+            for d3 in subgeneraux.codes_d3():
+                client['subs_' + d3 + 't'] = 0
             for a, annee in client['annees'].items():
                 for m, mois in annee['mois'].items():
                     client['bonus'] += mois['bj']
@@ -155,7 +159,10 @@ class Consolidation(object):
                 for d3 in subgeneraux.codes_d3():
                     compte['s-' + d3 + 't'] = min(compte[d3 + 't'], subprestations.donnees[compte['id_sub']+d3]['max'])
                     compte['subs'] += compte['s-' + d3 + 't']
+                    client['subs_' + d3 + 't'] = compte['s-' + d3 + 't']
                     if ('s' + d3) not in client_t3:
                         client_t3['s' + d3] = 0
                     client_t3['s' + d3] += compte['s-' + d3 + 't']
                 client['subs'] += compte['subs']
+                client['subs_ma'] += compte['s-mat']
+                client['subs_mo'] += compte['s-mot']
