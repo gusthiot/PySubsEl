@@ -28,7 +28,7 @@ class Consolidation(object):
                 client = donnee[bilan.cles['code client']]
                 sap = donnee[bilan.cles['code client sap']]
                 nature = donnee[bilan.cles['nature client']]
-                type = donnee[bilan.cles['type client']]
+                ctype = donnee[bilan.cles['type client']]
                 abrev = donnee[bilan.cles['abrév. labo']]
                 nom = donnee[bilan.cles['nom labo']]
                 id_compte = donnee[bilan.cles['id-compte']]
@@ -46,13 +46,13 @@ class Consolidation(object):
                     type_compte = donnee[bilan.cles['code type compte']]
                 if client not in self.clients:
                     annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
-                    self.clients[client] = {'comptes': {}, 'nature': nature, 'type': type, 'abrev': abrev, 'sap': sap,
+                    self.clients[client] = {'comptes': {}, 'nature': nature, 'type': ctype, 'abrev': abrev, 'sap': sap,
                                             'coherent': True, 'nom': nom, 'annees': annees}
                 else:
                     if nature != self.clients[client]['nature']:
                         self.clients[client]['coherent'] = False
-                        coherence_clients +=1
-                    if type != self.clients[client]['type']:
+                        coherence_clients += 1
+                    if ctype != self.clients[client]['type']:
                         self.clients[client]['coherent'] = False
                         coherence_clients += 1
                     if bilan.annee in self.clients[client]['annees']:
@@ -78,10 +78,11 @@ class Consolidation(object):
                         mois[d3 + 'j'] = j
                     if num_compte not in comptes:
                         annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
-                        type_s = subgeneraux.article_t(subcomptes.donnees[id_sub]['type_subside']).texte_t_court
+                        code_t3 = subcomptes.donnees[id_sub]['type_subside']
+                        type_s = subgeneraux.article_t(code_t3).texte_t_court
                         comptes[num_compte] = {'id_sub': id_sub, 'id_compte': id_compte, 'intitule': intitule,
                                                'type_p': subcomptes.donnees[id_sub]['intitule'], 'type': type_compte,
-                                               'type_s': type_s, 'coherent': True, 'annees': annees}
+                                               'type_s': type_s, 't3': code_t3, 'coherent': True, 'annees': annees}
                     else:
                         if id_sub != comptes[num_compte]['id_sub']:
                             comptes[num_compte]['coherent'] = False
@@ -129,6 +130,7 @@ class Consolidation(object):
         for cl, client in self.clients.items():
             client['subs'] = 0
             client['bonus'] = 0
+            client['codes'] = {}
             for a, annee in client['annees'].items():
                 for m, mois in annee['mois'].items():
                     client['bonus'] += mois['bj']
@@ -146,7 +148,14 @@ class Consolidation(object):
                 compte['s-mat'] = min(compte['mat'], submachines.donnees[compte['id_sub']]['max_ma'])
                 compte['s-mot'] = min(compte['mot'], submachines.donnees[compte['id_sub']]['max_mo'])
                 compte['subs'] = compte['s-mat'] + compte['s-mot']
+                if compte['t3'] not in client['codes']:
+                    client['codes'][compte['t3']] = {'sm': 0}
+                client_t3 = client['codes'][compte['t3']]
+                client_t3['sm'] += compte['s-mat'] + compte['s-mot']
                 for d3 in subgeneraux.codes_d3():
                     compte['s-' + d3 + 't'] = min(compte[d3 + 't'], subprestations.donnees[compte['id_sub']+d3]['max'])
                     compte['subs'] += compte['s-' + d3 + 't']
+                    if ('s' + d3) not in client_t3:
+                        client_t3['s' + d3] = 0
+                    client_t3['s' + d3] += compte['s-' + d3 + 't']
                 client['subs'] += compte['subs']

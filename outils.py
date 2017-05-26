@@ -82,6 +82,17 @@ class Outils(object):
             return str(mois)
 
     @staticmethod
+    def mois_nom(mois):
+        """
+        retourne le nom du mois en question
+        :param mois: mois formaté en nombre
+        :return: nom du mois
+        """
+        mois_fr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
+                   "novembre", "décembre"]
+        return mois_fr[mois-1]
+
+    @staticmethod
     def separateur_os(plateforme):
         """
         retourne le séparateur de chemin logique en fonction de l'OS (si windows ou pas)
