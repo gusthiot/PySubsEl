@@ -147,12 +147,23 @@ class SubGeneraux(object):
 
     def article_t(self, code):
         """
-        retourne l'articles T3 pour le code donné
+        retourne l'article T pour le code donné
 
         :return: un objet Article or None
         """
         for a in self.articles_t:
             if a.code_t == code:
+                return a
+        return None
+
+    def article_t_indice(self, indice):
+        """
+        retourne l'article T pour l'indice donné
+
+        :return: un objet Article or None
+        """
+        for a in self.articles_t:
+            if a.indice_t == indice:
                 return a
         return None
 

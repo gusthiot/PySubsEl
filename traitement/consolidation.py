@@ -39,58 +39,62 @@ class Consolidation(object):
                 except ValueError:
                     Outils.affiche_message("Le bonus n'est pas un nombre")
                     return 1
-                mois = {'bj': math.ceil(bj)}
-                if force and id_compte in force.obtenir_comptes():
-                    type_compte = force.obtenir_comptes()[id_compte]
-                else:
-                    type_compte = donnee[bilan.cles['code type compte']]
-                if client not in self.clients:
-                    annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
-                    self.clients[client] = {'comptes': {}, 'nature': nature, 'type': ctype, 'abrev': abrev, 'sap': sap,
-                                            'coherent': True, 'nom': nom, 'annees': annees}
-                else:
-                    if nature != self.clients[client]['nature']:
-                        self.clients[client]['coherent'] = False
-                        coherence_clients += 1
-                    if ctype != self.clients[client]['type']:
-                        self.clients[client]['coherent'] = False
-                        coherence_clients += 1
-                    if bilan.annee in self.clients[client]['annees']:
-                        self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois] = mois
+                if ctype == subgeneraux.article_t_indice('1').code_t and nature in subgeneraux.obtenir_code_n():
+                    mois = {'bj': bj}
+                    if force and id_compte in force.obtenir_comptes():
+                        type_compte = force.obtenir_comptes()[id_compte]
                     else:
-                        self.clients[client]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
-                comptes = self.clients[client]['comptes']
-                id_sub = subcomptes.obtenir_id(nature, type_compte)
-                if id_sub:
-                    try:
-                        maj = float(donnee[bilan.cles['maj']])
-                        moj = float(donnee[bilan.cles['moj']])
-                    except ValueError:
-                        Outils.affiche_message("Certaines valeurs (maj, moj) ne sont pas des nombres")
-                        return 1
-                    mois = {'maj': maj, 'moj': moj}
-                    for d3 in subgeneraux.codes_d3():
-                        try:
-                            j = float(donnee[bilan.cles[d3 + 'j']])
-                        except ValueError:
-                            Outils.affiche_message("Certaines valeurs d3 ne sont pas des nombres")
-                            return 1
-                        mois[d3 + 'j'] = j
-                    if num_compte not in comptes:
+                        type_compte = donnee[bilan.cles['code type compte']]
+                    if client not in self.clients:
                         annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
-                        code_t3 = subcomptes.donnees[id_sub]['type_subside']
-                        type_s = subgeneraux.article_t(code_t3).texte_t_court
-                        comptes[num_compte] = {'id_sub': id_sub, 'id_compte': id_compte, 'intitule': intitule,
-                                               'type_p': subcomptes.donnees[id_sub]['intitule'], 'type': type_compte,
-                                               'type_s': type_s, 't3': code_t3, 'coherent': True, 'annees': annees}
+                        self.clients[client] = {'comptes': {}, 'nature': nature, 'type': ctype, 'abrev': abrev, 'sap': sap,
+                                                'coherent': True, 'nom': nom, 'annees': annees}
                     else:
-                        if id_sub != comptes[num_compte]['id_sub']:
-                            comptes[num_compte]['coherent'] = False
-                            coherence_comptes += 1
-                        if bilan.annee in comptes[num_compte]['annees']:
-                            comptes[num_compte]['annees'][bilan.annee]['mois'][bilan.mois] = mois
+                        if nature != self.clients[client]['nature']:
+                            self.clients[client]['coherent'] = False
+                            coherence_clients += 1
+                        if ctype != self.clients[client]['type']:
+                            self.clients[client]['coherent'] = False
+                            coherence_clients += 1
+                        if bilan.annee in self.clients[client]['annees']:
+                            if bilan.mois in self.clients[client]['annees'][bilan.annee]['mois']:
+                                self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois]['bj'] += bj
+                            else:
+                                self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois] = mois
                         else:
-                            comptes[num_compte]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
+                            self.clients[client]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
+                    comptes = self.clients[client]['comptes']
+                    id_sub = subcomptes.obtenir_id(nature, type_compte)
+                    if id_sub:
+                        try:
+                            maj = float(donnee[bilan.cles['maj']])
+                            moj = float(donnee[bilan.cles['moj']])
+                        except ValueError:
+                            Outils.affiche_message("Certaines valeurs (maj, moj) ne sont pas des nombres")
+                            return 1
+                        mois = {'maj': maj, 'moj': moj}
+                        for d3 in subgeneraux.codes_d3():
+                            try:
+                                j = float(donnee[bilan.cles[d3 + 'j']])
+                            except ValueError:
+                                Outils.affiche_message("Certaines valeurs d3 ne sont pas des nombres")
+                                return 1
+                            mois[d3 + 'j'] = j
+                        if num_compte not in comptes:
+                            annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
+                            code_t3 = subcomptes.donnees[id_sub]['type_subside']
+                            type_s = subgeneraux.article_t(code_t3).texte_t_court
+                            comptes[num_compte] = {'id_sub': id_sub, 'id_compte': id_compte, 'intitule': intitule,
+                                                   'type_p': subcomptes.donnees[id_sub]['intitule'], 'type': type_compte,
+                                                   'type_s': type_s, 't3': code_t3, 'coherent': True, 'annees': annees}
+                        else:
+                            if id_sub != comptes[num_compte]['id_sub']:
+                                comptes[num_compte]['coherent'] = False
+                                coherence_comptes += 1
+                            if bilan.annee in comptes[num_compte]['annees']:
+                                comptes[num_compte]['annees'][bilan.annee]['mois'][bilan.mois] = mois
+                            else:
+                                comptes[num_compte]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
 
         if coherence_clients > 0:
             msg = "Les clients suivants ne sont pas homogènes sur la période, " \
@@ -112,18 +116,6 @@ class Consolidation(object):
         reponse = coherence_clients + coherence_comptes
         self.a_verifier = 0
 
-        if reponse == 0:
-            a_effacer = []
-            for k, v in self.clients.items():
-                if len(v['comptes']) == 0:
-                    a_effacer.append(k)
-                    continue
-                del v['coherent']
-                for l, w in v['comptes'].items():
-                    del w['coherent']
-            for k in a_effacer:
-                del self.clients[k]
-
         return reponse
 
     def calcul_sommes(self, subgeneraux, submachines, subprestations):
@@ -137,6 +129,7 @@ class Consolidation(object):
                 client['subs_' + d3 + 't'] = 0
             for a, annee in client['annees'].items():
                 for m, mois in annee['mois'].items():
+                    mois['bj'] = math.ceil(mois['bj'])
                     client['bonus'] += mois['bj']
             for co, compte in client['comptes'].items():
                 compte['mat'] = 0
@@ -166,3 +159,14 @@ class Consolidation(object):
                 client['subs'] += compte['subs']
                 client['subs_ma'] += compte['s-mat']
                 client['subs_mo'] += compte['s-mot']
+
+        a_effacer = []
+        for code, client in self.clients.items():
+            if len(client['comptes']) == 0 and client['bonus'] == 0:
+                a_effacer.append(code)
+                continue
+            del client['coherent']
+            for l, w in client['comptes'].items():
+                del w['coherent']
+        for k in a_effacer:
+            del self.clients[k]
