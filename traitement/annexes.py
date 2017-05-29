@@ -265,40 +265,44 @@ class Annexes(object):
 
             contenu += Latex.tableau(contenu_bonus, structure_bonus, legende_bonus)
         else:
-            contenu += Latex.tableau_vide(r'''Table 2 - Pas de bonus d'utilisation en heures creuses''')
+            contenu += Latex.tableau_vide(r'''Table 2 vide : Pas de bonus d'utilisation en heures creuses''')
 
-        # ## 3
+        if client['subs'] > 0:
+            # ## 3
 
-        structure_recap = r'''{|r|l|l|l|l|r|}'''
-        contenu_recap = r'''
-            \hline
-            \multicolumn{1}{|c|}{N. compte} & \multicolumn{1}{c|}{Intitulé compte} & \multicolumn{1}{c|}{Code} & 
-            \multicolumn{1}{c|}{Type Subsides} & \multicolumn{1}{c|}{Type projet} & \multicolumn{1}{c|}{Montant} \\
-            \hline
-            '''
-        contenu_recap += contenu_recap_compte
-        contenu_recap += r'''
-            \multicolumn{5}{|r|}{TOTAL} & ''' + Outils.format_2_dec(client['subs']) + r''' \\
-            \hline
-            '''
+            structure_recap = r'''{|r|l|l|l|l|r|}'''
+            contenu_recap = r'''
+                \hline
+                \multicolumn{1}{|c|}{N. compte} & \multicolumn{1}{c|}{Intitulé compte} & \multicolumn{1}{c|}{Code} & 
+                \multicolumn{1}{c|}{Type Subsides} & \multicolumn{1}{c|}{Type projet} & \multicolumn{1}{c|}{Montant} \\
+                \hline
+                '''
+            contenu_recap += contenu_recap_compte
+            contenu_recap += r'''
+                \multicolumn{5}{|r|}{TOTAL} & ''' + Outils.format_2_dec(client['subs']) + r''' \\
+                \hline
+                '''
 
-        legende_recap = r'''Table 3 - Récapitulatif des subsides par compte'''
+            legende_recap = r'''Table 3 - Récapitulatif des subsides par compte'''
 
-        contenu += Latex.tableau(contenu_recap, structure_recap, legende_recap)
+            contenu += Latex.tableau(contenu_recap, structure_recap, legende_recap)
 
-        contenu += r'''
-            \clearpage
-            '''
+            contenu += r'''
+                \clearpage
+                '''
 
-        # ## 4
+            # ## 4
 
-        structure_detail = r'''{|c|r|r|r|'''
-        for i in range(taille_d3):
-            structure_detail += r'''r|'''
-        structure_detail += r'''}'''
+            structure_detail = r'''{|c|r|r|r|'''
+            for i in range(taille_d3):
+                structure_detail += r'''r|'''
+            structure_detail += r'''}'''
 
-        legende_detail = r'''Table 4 - Détail des subsides'''
+            legende_detail = r'''Table 4 - Détail des subsides'''
 
-        contenu += Latex.long_tableau(contenu_detail_compte, structure_detail, legende_detail)
+            contenu += Latex.long_tableau(contenu_detail_compte, structure_detail, legende_detail)
+
+        else:
+            contenu += Latex.tableau_vide(r'''Table 3 vide : Pas de subsides''')
 
         return contenu

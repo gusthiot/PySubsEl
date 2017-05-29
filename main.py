@@ -66,7 +66,6 @@ while 1:
     chemin = Outils.chemin([dossier_bilans, annee, Outils.mois_string(mois), fichier_complet], plateforme)
     if not Outils.existe(chemin):
         msg = "Le fichier '" + fichier_complet + "' manque dans le dossier !"
-        print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
