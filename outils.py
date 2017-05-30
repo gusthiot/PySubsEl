@@ -2,6 +2,7 @@ from tkinter.filedialog import *
 from tkinter.scrolledtext import *
 
 import os
+import platform
 
 from erreurs import ErreurConsistance
 
@@ -10,6 +11,11 @@ class Outils(object):
     """
     Classe contenant diverses méthodes utiles
     """
+    if platform.system() in ['Linux', 'Darwin']:
+        _interface_graphique = len(os.environ.get('DISPLAY', '')) > 0
+    else:
+        _interface_graphique = True
+
     @classmethod
     def interface_graphique(cls, opt_nouvelle_valeur=None):
         """
