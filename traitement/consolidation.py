@@ -163,7 +163,7 @@ class Consolidation(object):
 
         a_effacer = []
         for code, client in self.clients.items():
-            if len(client['comptes']) == 0 and client['bonus'] == 0:
+            if client['subs'] == 0 and client['bonus'] == 0:
                 a_effacer.append(code)
                 continue
             del client['coherent']
