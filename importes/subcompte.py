@@ -78,8 +78,8 @@ class SubCompte(SubFichier):
             if donnee['type_subside'] == "":
                 msg += "le type subside de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['type_subside'] not in subgeneraux.obtenir_code_t():
-                msg += "la type subside '" + donnee['type_subside'] + "' de la ligne " + str(ligne) +\
-                    " n'existe pas dans les types N\n"
+                msg += "le type subside '" + donnee['type_subside'] + "' de la ligne " + str(ligne) +\
+                    " n'existe pas dans les types T3\n"
 
             donnees_dict[donnee['id_compte']] = donnee
 
