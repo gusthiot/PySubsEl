@@ -127,65 +127,66 @@ class Annexes(object):
 
             # ## partie 4
 
-            dico_detail_compte = {'taille': (4 + taille_d3), 'numero': num_compte,
-                                  'intitule': Latex.echappe_caracteres(compte['intitule']),
-                                  'type': Latex.echappe_caracteres(compte['type'])}
-            if inc_4 > 0:
+            if compte['subs'] > 0:
+                dico_detail_compte = {'taille': (4 + taille_d3), 'numero': num_compte,
+                                      'intitule': Latex.echappe_caracteres(compte['intitule']),
+                                      'type': Latex.echappe_caracteres(compte['type'])}
+                if inc_4 > 0:
+                    contenu_detail_compte += r'''
+                        \multicolumn{%(taille)s}{c}{} \\ \noalign{\penalty-5000}
+                          ''' % dico_detail_compte
+                else:
+                    inc_4 = 1
                 contenu_detail_compte += r'''
-                    \multicolumn{%(taille)s}{c}{} \\ \noalign{\penalty-5000}
+                    \hline
+                    \multicolumn{%(taille)s}{|c|}{%(numero)s - %(intitule)s - %(type)s} \\*
+                    \hline
+                    Année & \multicolumn{1}{c|}{Mois} & \multicolumn{1}{c|}{Machine} & \multicolumn{1}{c|}{M.O. op.} 
                       ''' % dico_detail_compte
-            else:
-                inc_4 = 1
-            contenu_detail_compte += r'''
-                \hline
-                \multicolumn{%(taille)s}{|c|}{%(numero)s - %(intitule)s - %(type)s} \\*
-                \hline
-                Année & \multicolumn{1}{c|}{Mois} & \multicolumn{1}{c|}{Machine} & \multicolumn{1}{c|}{M.O. op.} 
-                  ''' % dico_detail_compte
 
-            for article in subgeneraux.articles_d3:
-                contenu_detail_compte += r''' & \multicolumn{1}{c|}{
-                    ''' + Latex.echappe_caracteres(article.intitule_court) + r'''}'''
+                for article in subgeneraux.articles_d3:
+                    contenu_detail_compte += r''' & \multicolumn{1}{c|}{
+                        ''' + Latex.echappe_caracteres(article.intitule_court) + r'''}'''
 
-            for a, annee in sorted(compte['annees'].items()):
-                for m, mois in sorted(annee['mois'].items()):
-                    dico = {'annee': a, 'mois': m, 'maj': Outils.format_2_dec(mois['maj']),
-                            'moj': Outils.format_2_dec(mois['moj'])}
-                    contenu_detail_compte += r'''\\*
-                        \hline
-                        %(annee)s & %(mois)s & %(maj)s & %(moj)s
-                        ''' % dico
-                    for d3 in subgeneraux.codes_d3():
-                        contenu_detail_compte += r''' & ''' + Outils.format_2_dec(mois[d3 + 'j'])
+                for a, annee in sorted(compte['annees'].items()):
+                    for m, mois in sorted(annee['mois'].items()):
+                        dico = {'annee': a, 'mois': m, 'maj': Outils.format_2_dec(mois['maj']),
+                                'moj': Outils.format_2_dec(mois['moj'])}
+                        contenu_detail_compte += r'''\\*
+                            \hline
+                            %(annee)s & %(mois)s & %(maj)s & %(moj)s
+                            ''' % dico
+                        for d3 in subgeneraux.codes_d3():
+                            contenu_detail_compte += r''' & ''' + Outils.format_2_dec(mois[d3 + 'j'])
 
-            dico_detail_compte = {'mat': Outils.format_2_dec(compte['mat']), 'mot': Outils.format_2_dec(compte['mot'])}
+                dico_detail_compte = {'mat': Outils.format_2_dec(compte['mat']), 'mot': Outils.format_2_dec(compte['mot'])}
 
-            contenu_detail_compte += r'''\\*
-                \hline
-                \multicolumn{2}{|l|}{Total période} & %(mat)s & %(mot)s
-                ''' % dico_detail_compte
-            for d3 in subgeneraux.codes_d3():
-                contenu_detail_compte += r''' &
-                ''' + Outils.format_2_dec(compte[d3 + 't'])
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Total période} & %(mat)s & %(mot)s
+                    ''' % dico_detail_compte
+                for d3 in subgeneraux.codes_d3():
+                    contenu_detail_compte += r''' &
+                    ''' + Outils.format_2_dec(compte[d3 + 't'])
 
-            dico_detail_compte = {'s-mat': Outils.format_2_dec(compte['s-mat']),
-                                  's-mot': Outils.format_2_dec(compte['s-mot'])}
+                dico_detail_compte = {'s-mat': Outils.format_2_dec(compte['s-mat']),
+                                      's-mot': Outils.format_2_dec(compte['s-mot'])}
 
-            contenu_detail_compte += r'''\\*
-                \hline
-                \multicolumn{2}{|l|}{Subsides} & %(s-mat)s & %(s-mot)s
-                ''' % dico_detail_compte
-            for d3 in subgeneraux.codes_d3():
-                contenu_detail_compte += r''' &
-                ''' + Outils.format_2_dec(compte['s-' + d3 + 't'])
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Subsides} & %(s-mat)s & %(s-mot)s
+                    ''' % dico_detail_compte
+                for d3 in subgeneraux.codes_d3():
+                    contenu_detail_compte += r''' &
+                    ''' + Outils.format_2_dec(compte['s-' + d3 + 't'])
 
-            dico_detail_compte = {'taille': (2 + len(subgeneraux.articles_d3)),
-                                  'subs': Outils.format_2_dec(compte['subs'])}
-            contenu_detail_compte += r'''\\*
-                \hline
-                \multicolumn{2}{|l|}{Total subsides} & \multicolumn{%(taille)s}{r|}{%(subs)s} \\ 
-                \hline
-                ''' % dico_detail_compte
+                dico_detail_compte = {'taille': (2 + len(subgeneraux.articles_d3)),
+                                      'subs': Outils.format_2_dec(compte['subs'])}
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Total subsides} & \multicolumn{%(taille)s}{r|}{%(subs)s} \\ 
+                    \hline
+                    ''' % dico_detail_compte
 
         # ## 1
 
