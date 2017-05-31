@@ -43,12 +43,13 @@ class BilanComptes(object):
         lignes = []
         for code_client, client in sorted(consolidation.clients.items()):
             for num_compte, compte in sorted(client['comptes'].items()):
-                ligne = [subedition.annee_fin, subedition.mois_fin, code_client, client['sap'], client['abrev'],
-                         client['nom'], client['type'], client['nature'], compte['id_compte'], num_compte,
-                         compte['intitule'], compte['type'], compte['t3'], Outils.format_2_dec(compte['s-mat']),
-                         Outils.format_2_dec(compte['s-mot'])]
-                for categorie in subgeneraux.codes_d3():
-                    ligne.append(Outils.format_2_dec(compte['s-' + categorie + 't']))
-                ligne += [Outils.format_2_dec(compte['subs'])]
-                lignes.append(ligne)
+                if compte['subs'] > 0:
+                    ligne = [subedition.annee_fin, subedition.mois_fin, code_client, client['sap'], client['abrev'],
+                             client['nom'], client['type'], client['nature'], compte['id_compte'], num_compte,
+                             compte['intitule'], compte['type'], compte['t3'], Outils.format_2_dec(compte['s-mat']),
+                             Outils.format_2_dec(compte['s-mot'])]
+                    for categorie in subgeneraux.codes_d3():
+                        ligne.append(Outils.format_2_dec(compte['s-' + categorie + 't']))
+                    ligne += [Outils.format_2_dec(compte['subs'])]
+                    lignes.append(ligne)
         return lignes

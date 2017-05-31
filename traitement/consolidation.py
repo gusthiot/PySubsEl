@@ -153,7 +153,7 @@ class Consolidation(object):
                 for d3 in subgeneraux.codes_d3():
                     compte['s-' + d3 + 't'] = min(compte[d3 + 't'], subprestations.donnees[compte['id_sub']+d3]['max'])
                     compte['subs'] += compte['s-' + d3 + 't']
-                    client['subs_' + d3 + 't'] = compte['s-' + d3 + 't']
+                    client['subs_' + d3 + 't'] += compte['s-' + d3 + 't']
                     if ('s' + d3) not in client_t3:
                         client_t3['s' + d3] = 0
                     client_t3['s' + d3] += compte['s-' + d3 + 't']
