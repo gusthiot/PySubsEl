@@ -34,11 +34,14 @@ class Consolidation(object):
                 id_compte = donnee[bilan.cles['id-compte']]
                 num_compte = donnee[bilan.cles['numéro compte']]
                 intitule = donnee[bilan.cles['intitulé compte']]
-                try:
-                    bj = float(donnee[bilan.cles['bonus']])
-                except ValueError:
-                    Outils.affiche_message("Le bonus n'est pas un nombre")
-                    return 1
+                if subgeneraux.avec_bonus:
+                    try:
+                        bj = float(donnee[bilan.cles['bonus']])
+                    except ValueError:
+                        Outils.affiche_message("Le bonus n'est pas un nombre")
+                        return 1
+                else:
+                    bj = 0
                 if ctype == subgeneraux.article_t_indice('1').code_t and nature in subgeneraux.obtenir_code_n():
                     mois = {'bj': bj}
                     if force and id_compte in force.obtenir_comptes():

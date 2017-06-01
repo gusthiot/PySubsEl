@@ -54,12 +54,28 @@ class SubGeneraux(object):
                 codes_t.append(tt)
             else:
                 erreurs += "le code T '" + tt + "' n'est pas unique\n"
+        nb = 0
+        self.avec_bonus = False
+        for it in self._donnees['indice_t']:
+            if it == '2':
+                nb += 1
+        if nb > 1:
+            erreurs += "le code T2 doit être unique ou nul"
+        if nb == 1:
+            self.avec_bonus = True
+
         codes_d = []
         for dd in self._donnees['code_d'][1:]:
             if dd not in codes_d:
                 codes_d.append(dd)
             else:
                 erreurs += "le code D '" + dd + "' n'est pas unique\n"
+        nb = 0
+        for id in self._donnees['indice_d']:
+            if id == '2':
+                nb += 1
+        if nb != 1:
+            erreurs += "le code D2 doit être unique et exister"
 
         if (len(self._donnees['code_d']) != len(self._donnees['indice_d'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['intitule_long'])) or \

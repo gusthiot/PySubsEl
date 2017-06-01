@@ -198,9 +198,9 @@ class Annexes(object):
             '''
         base = client['nature'] + str(subedition.annee_fin)[2:] + Outils.mois_string(subedition.mois_fin)
         if client['bonus'] > 0:
-            poste = Latex.echappe_caracteres(subgeneraux.article_t('B').texte_t_long)
+            poste = Latex.echappe_caracteres(subgeneraux.article_t_indice('2').texte_t_long)
             prestation = Latex.echappe_caracteres(subgeneraux.articles[0].intitule_long)
-            op = 'B' + base + subgeneraux.articles[0].code_d
+            op = subgeneraux.article_t_indice('2').code_t + base + subgeneraux.articles[0].code_d
             dico = {'op': op, 'poste': poste, 'prestation': prestation, 'montant': Outils.format_2_dec(client['bonus'])}
             contenu_total += r'''
                 %(op)s & %(poste)s & %(prestation)s & %(montant)s \\
@@ -249,7 +249,7 @@ class Annexes(object):
 
             for a, annee in sorted(client['annees'].items()):
                 for m, mois in sorted(annee['mois'].items()):
-                    code = Latex.echappe_caracteres(subgeneraux.article_t('B').texte_t_court)
+                    code = Latex.echappe_caracteres(subgeneraux.article_t_indice('2').texte_t_court)
                     dico = {'annee': a, 'mois': m, 'bj': mois['bj'],
                             'code': code}
                     contenu_bonus += r'''
