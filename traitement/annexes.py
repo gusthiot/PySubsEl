@@ -30,6 +30,16 @@ class Annexes(object):
                 \usepackage{fancyhdr}
                 '''
 
+            if subedition.filigrane != "":
+                contenu += r'''
+                    \usepackage{draftwatermark}
+                    \SetWatermarkLightness{0.8}
+                    \SetWatermarkAngle{45}
+                    \SetWatermarkScale{2}
+                    \SetWatermarkFontSize{2cm}
+                    \SetWatermarkText{''' + subedition.filigrane[:15] + r'''}
+                    '''
+
             contenu += r'''
                 \pagestyle{fancy}
 
@@ -159,7 +169,8 @@ class Annexes(object):
                         for d3 in subgeneraux.codes_d3():
                             contenu_detail_compte += r''' & ''' + Outils.format_2_dec(mois[d3 + 'j'])
 
-                dico_detail_compte = {'mat': Outils.format_2_dec(compte['mat']), 'mot': Outils.format_2_dec(compte['mot'])}
+                dico_detail_compte = {'mat': Outils.format_2_dec(compte['mat']),
+                                      'mot': Outils.format_2_dec(compte['mot'])}
 
                 contenu_detail_compte += r'''\\*
                     \hline

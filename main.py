@@ -26,6 +26,7 @@ from parametres import (SubEdition,
                         SubGeneraux)
 from traitement import (Verification,
                         Annexes,
+                        Virement,
                         BilanMensuel,
                         BilanComptes,
                         Consolidation)
@@ -69,8 +70,8 @@ while 1:
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
-    dossier_source = DossierSource(Outils.chemin([dossier_bilans, annee, Outils.mois_string(mois)], plateforme))
-    bilans.append(Bilan(dossier_source, fichier_complet, annee, mois))
+    dossier_source_bilan = DossierSource(Outils.chemin([dossier_bilans, annee, Outils.mois_string(mois)], plateforme))
+    bilans.append(Bilan(dossier_source_bilan, fichier_complet, annee, mois))
 
     if mois == subedition.mois_fin and annee == subedition.annee_fin:
         break
@@ -100,5 +101,19 @@ bm_lignes = BilanMensuel.creation_lignes(subedition, subgeneraux, consolidation)
 BilanMensuel.bilan(dossier_destination, subedition, subgeneraux, bm_lignes)
 bc_lignes = BilanComptes.creation_lignes(subedition, subgeneraux, consolidation)
 BilanComptes.bilan(dossier_destination, subedition, subgeneraux, bc_lignes)
+
+Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
+Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
+annexes = "annexes"
+Virement.virements(consolidation, dossier_destination, subedition, subgeneraux, annexes)
+
+for fichier in [force.nom_fichier, subcomptes.nom_fichier, submachines.nom_fichier, subprestations.nom_fichier,
+                subgeneraux.nom_fichier, subedition.nom_fichier]:
+    dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
+for bilan in bilans:
+    dossier_source_bilan = DossierSource(Outils.chemin([dossier_bilans, bilan.annee, Outils.mois_string(bilan.mois)],
+                                                       plateforme))
+    dossier_destination.ecrire(bilan.nom, dossier_source_bilan.lire(bilan.nom))
+
 
 Outils.affiche_message("OK !!!")

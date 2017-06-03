@@ -1,6 +1,8 @@
 from tkinter.filedialog import *
 from tkinter.scrolledtext import *
 
+import shutil
+import errno
 import os
 import platform
 
@@ -57,6 +59,27 @@ class Outils(object):
             sys.exit(1)
         else:
             sys.exit(4)            
+
+    @staticmethod
+    def copier_dossier(source, dossier, destination):
+        """
+        copier un dossier
+        :param source: chemin du dossier à copier
+        :param dossier: dossier à copier
+        :param destination: chemin de destination de copie
+        """
+        chemin = destination + "/" + dossier
+        if not os.path.exists(chemin):
+            try:
+                shutil.copytree(source + dossier, chemin)
+            except OSError as exc:
+                if exc.errno == errno.ENOTDIR:
+                    shutil.copy(source, destination)
+
+    if platform.system() in ['Linux', 'Darwin']:
+        _interface_graphique = len(os.environ.get('DISPLAY', '')) > 0
+    else:
+        _interface_graphique = True
 
     @staticmethod
     def choisir_dossier(plateforme):

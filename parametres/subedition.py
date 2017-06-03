@@ -23,7 +23,7 @@ class SubEdition(object):
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : " + SubEdition.nom_fichier)
 
-        num = 2
+        num = 3
         if len(donnees_csv) != num:
             Outils.fatal(ErreurConsistance(),
                          SubEdition.libelle + ": nombre de lignes incorrect : " +
@@ -40,3 +40,5 @@ class SubEdition(object):
 
         if self.annee_debut > self.annee_fin or self.annee_debut == self.annee_fin and self.mois_debut > self.mois_fin:
             Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin ne peut être avant le début")
+
+        self.filigrane = donnees_csv[2][1]
