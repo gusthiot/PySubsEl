@@ -5,7 +5,7 @@ from collections import namedtuple
 _champs_article = ["indice_d", "code_d", "intitule_long", "intitule_court"]
 Article = namedtuple("Article", _champs_article)
 
-_champs_article_t = ["indice_t", "code_t", "texte_t_long", "texte_t_court"]
+_champs_article_t = ["indice_t", "code_t", "texte_t_long", "texte_t_court", "texte_t_ref"]
 Article_t = namedtuple("Article_t", _champs_article_t)
 
 class SubGeneraux(object):
@@ -16,7 +16,7 @@ class SubGeneraux(object):
     nom_fichier = "s-paramgen.csv"
     libelle = "Paramètres Généraux"
     cles = ['financier', 'fonds', 'lien', 'lecture', 'sauvegarde', 'indice_t', 'code_t', 'texte_t_long',
-            'texte_t_court', 'code_n', 'indice_d', 'code_d', 'intitule_long', 'intitule_court']
+            'texte_t_court', "texte_t_ref", 'code_n', 'indice_d', 'code_d', 'intitule_long', 'intitule_court']
 
     def __init__(self, dossier_source):
         """
@@ -85,9 +85,10 @@ class SubGeneraux(object):
 
         if (len(self._donnees['code_t']) != len(self._donnees['indice_t'])) or \
                 (len(self._donnees['code_t']) != len(self._donnees['texte_t_long'])) or \
+                (len(self._donnees['code_t']) != len(self._donnees['texte_t_ref'])) or \
                 (len(self._donnees['code_t']) != len(self._donnees['texte_t_court'])):
             erreurs += "le nombre de colonnes doit être le même pour le code T, l'indice T, le texte T long" \
-                       " et le texte T court\n"
+                       ", le texte T court et le texte T ref\n"
 
         if erreurs != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + erreurs)

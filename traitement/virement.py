@@ -27,7 +27,7 @@ class Virement(object):
                                      "Code TVA au débit", "Texte du poste au débit", "Clé compta au crédit",
                                      "Compte au crédit", "Fonds au crédit", "Code opération au crédit",
                                      "Centre de coût au crédit", "Centre financier au crédit", "Code TVA au crédit",
-                                     "Texte d'entête", "Code Client SAP (Crédit)"])
+                                     "Texte du poste au crédit", "Code Client SAP (Crédit)"])
 
             combo_list = {}
 
@@ -67,10 +67,11 @@ class Virement(object):
                     texte = subgeneraux.article_t_indice('2').texte_t_court + " / " + \
                             subgeneraux.articles[0].intitule_court
                     op = subgeneraux.article_t_indice('2').code_t + base + subgeneraux.articles[0].code_d
+                    t_ref = subgeneraux.article_t_indice('2').texte_t_ref
 
-                    fichier_writer.writerow([reference, reference, "", "%.2f" % dcl['bonus'], "", "",
+                    fichier_writer.writerow([t_ref, t_ref, "", "%.2f" % dcl['bonus'], "", "",
                                              subgeneraux.fonds, op, "", "", "", reference, "", "", "", "", "", "", "",
-                                             "Cmi : " + texte, dcl['sap']])
+                                             "CMi : " + texte, dcl['sap']])
 
                     poste = subgeneraux.article_t_indice('2').texte_t_long
                     prestation = subgeneraux.articles[0].intitule_long
@@ -79,10 +80,11 @@ class Virement(object):
                 for t3, client_t3 in sorted(dcl['codes'].items()):
                     op = t3 + base + subgeneraux.articles[0].code_d
                     texte = subgeneraux.article_t(t3).texte_t_court + " / " + subgeneraux.articles[0].intitule_court
+                    t_ref = subgeneraux.article_t(t3).texte_t_ref
 
-                    fichier_writer.writerow([reference, reference, "", "%.2f" % client_t3['sm'], "", "",
+                    fichier_writer.writerow([t_ref, t_ref, "", "%.2f" % client_t3['sm'], "", "",
                                              subgeneraux.fonds, op, "", "", "", reference, "", "", "", "", "", "", "",
-                                             "Cmi : " + texte, dcl['sap']])
+                                             "CMi : " + texte, dcl['sap']])
 
                     poste = subgeneraux.article_t(t3).texte_t_long
                     prestation = subgeneraux.articles[0].intitule_long
@@ -93,9 +95,9 @@ class Virement(object):
                             op = t3 + base + article.code_d
                             texte = subgeneraux.article_t(t3).texte_t_court + " / " + article.intitule_court
 
-                            fichier_writer.writerow([reference, reference, "", "%.2f" % client_t3['s' + article.code_d],
+                            fichier_writer.writerow([t_ref, t_ref, "", "%.2f" % client_t3['s' + article.code_d],
                                                      "", "", subgeneraux.fonds, op, "", "", "", reference, "", "", "",
-                                                     "", "", "", "", "Cmi : " + texte, dcl['sap']])
+                                                     "", "", "", "", "CMi : " + texte, dcl['sap']])
 
                             poste = subgeneraux.article_t(t3).texte_t_long
                             prestation = article.intitule_long
