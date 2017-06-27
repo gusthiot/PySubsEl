@@ -7,7 +7,7 @@ class SubPrestation(SubFichier):
     Classe pour l'importation des données de Plafonds des Subsides de Prestations
     """
 
-    cles = ['id_compte', 'categorie', 'max']
+    cles = ['id_compte', 'categorie', 'max_mois', 'max_compte']
     nom_fichier = "plafprestation.csv"
     libelle = "Plafonds Subsides Prestations"
 
@@ -50,7 +50,10 @@ class SubPrestation(SubFichier):
                     msg += "Couple categorie '" + donnee['categorie'] + "' et compte id '" + \
                            donnee['id_compte'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['max'], info = Outils.est_un_nombre(donnee['max'], "le maximum", ligne)
+            donnee['max_mois'], info = Outils.est_un_nombre(donnee['max_mois'], "le maximum mois", ligne)
+            msg += info
+
+            donnee['max_compte'], info = Outils.est_un_nombre(donnee['max_compte'], "le maximum compte", ligne)
             msg += info
 
             donnees_dict[donnee['id_compte'] + donnee['categorie']] = donnee

@@ -59,8 +59,8 @@ class Annexes(object):
                 \begin{document}
                 \renewcommand{\arraystretch}{1.5}
                 '''
-            reference = "SUBS" + str(subedition.annee_fin)[2:] + Outils.mois_string(subedition.mois_fin) + "." + \
-                        code_client
+            reference = "SUBS" + str(subedition.annee_fin_general)[2:] + \
+                        Outils.mois_string(subedition.mois_fin_general) + "." + code_client
 
             contenu += r'''
                 \begin{titlepage}
@@ -70,10 +70,11 @@ class Annexes(object):
                 \Large\textsc{''' + reference + r'''}\newline\newline\newline
                 '''
 
+            debut = Outils.mois_nom(subedition.mois_debut_general) + " " + str(subedition.annee_debut_general)
+            fin = Outils.mois_nom(subedition.mois_fin_general) + " " + str(subedition.annee_fin_general)
             dic_entete = {'code': code_client, 'code_sap': Latex.echappe_caracteres(dcl['sap']),
                           'nom': Latex.echappe_caracteres(dcl['abrev']),
-                          'debut': Outils.mois_nom(subedition.mois_debut) + " " + str(subedition.annee_debut),
-                          'fin': Outils.mois_nom(subedition.mois_fin) + " " + str(subedition.annee_fin)}
+                          'debut': debut, 'fin': fin}
 
             contenu += r'''Client %(code)s - %(code_sap)s - %(nom)s \newline
                  %(debut)s - %(fin)s
@@ -84,8 +85,8 @@ class Annexes(object):
             contenu += Annexes.contenu_client(code_client, consolidation, subgeneraux, subedition)
             contenu += r'''\end{document}'''
 
-            nom = "subside_" + str(subedition.annee_fin) + "_" + Outils.mois_string(subedition.mois_fin) + "_" + \
-                  code_client
+            nom = "subside_" + str(subedition.annee_fin_general) + "_" + \
+                  Outils.mois_string(subedition.mois_fin_general) + "_" + code_client
 
             Latex.creer_latex_pdf(nom, contenu, dossier_annexe)
 
@@ -102,12 +103,14 @@ class Annexes(object):
         contenu = ""
 
         client = consolidation.clients[code_client]
-        reference = "SUBS" + str(subedition.annee_fin)[2:] + Outils.mois_string(subedition.mois_fin) + "." + code_client
+        reference = "SUBS" + str(subedition.annee_fin_general)[2:] + \
+                    Outils.mois_string(subedition.mois_fin_general) + "." + code_client
 
+        debut = Outils.mois_nom(subedition.mois_debut_general) + " " + str(subedition.annee_debut_general)
+        fin = Outils.mois_nom(subedition.mois_fin_general) + " " + str(subedition.annee_fin_general)
         dic_section = {'code': code_client, 'code_sap': Latex.echappe_caracteres(client['sap']),
                        'nom': Latex.echappe_caracteres(client['abrev']), 'ref': reference,
-                       'date_debut': Outils.mois_nom(subedition.mois_debut) + " " + str(subedition.annee_debut),
-                       'date_fin': Outils.mois_nom(subedition.mois_fin) + " " + str(subedition.annee_fin)}
+                       'date_debut': debut, 'date_fin': fin}
 
         contenu += r'''
             \fakesection{%(ref)s \hspace*{4cm} Client %(code)s - %(code_sap)s - %(nom)s - %(date_debut)s - %(date_fin)s}
@@ -169,8 +172,14 @@ class Annexes(object):
                         for d3 in subgeneraux.codes_d3():
                             contenu_detail_compte += r''' & ''' + Outils.format_2_dec(mois[d3 + 'j'])
 
-                dico_detail_compte = {'mat': Outils.format_2_dec(compte['mat']),
-                                      'mot': Outils.format_2_dec(compte['mot'])}
+                dico_detail_compte = {'ma_mois': compte['ma_mois'], 'mo_mois': compte['mo_mois'],
+                                      'ma_compte': compte['ma_compte'], 'mo_compte': compte['mo_compte'],
+                                      'mat': Outils.format_2_dec(compte['mat']),
+                                      'mot': Outils.format_2_dec(compte['mot']),
+                                      'mat_p': Outils.format_2_dec(compte['mat_p']),
+                                      'mot_p': Outils.format_2_dec(compte['mot_p']),
+                                      's-mat': Outils.format_2_dec(compte['s-mat']),
+                                      's-mot': Outils.format_2_dec(compte['s-mot'])}
 
                 contenu_detail_compte += r'''\\*
                     \hline
@@ -180,8 +189,29 @@ class Annexes(object):
                     contenu_detail_compte += r''' &
                     ''' + Outils.format_2_dec(compte[d3 + 't'])
 
-                dico_detail_compte = {'s-mat': Outils.format_2_dec(compte['s-mat']),
-                                      's-mot': Outils.format_2_dec(compte['s-mot'])}
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Plafond par mois} & %(ma_mois)s & %(mo_mois)s
+                    ''' % dico_detail_compte
+                for d3 in subgeneraux.codes_d3():
+                    contenu_detail_compte += r''' &
+                    ''' + Outils.format_2_dec(compte[d3 + '_mois'])
+
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Total des montants plafonnés} & %(mat_p)s & %(mot_p)s
+                    ''' % dico_detail_compte
+                for d3 in subgeneraux.codes_d3():
+                    contenu_detail_compte += r''' &
+                    ''' + Outils.format_2_dec(compte[d3 + 't_p'])
+
+                contenu_detail_compte += r'''\\*
+                    \hline
+                    \multicolumn{2}{|l|}{Plafond par compte} & %(ma_compte)s & %(mo_compte)s
+                    ''' % dico_detail_compte
+                for d3 in subgeneraux.codes_d3():
+                    contenu_detail_compte += r''' &
+                    ''' + Outils.format_2_dec(compte[d3 + '_compte'])
 
                 contenu_detail_compte += r'''\\*
                     \hline
@@ -207,7 +237,8 @@ class Annexes(object):
             Code OP & \multicolumn{1}{c|}{Poste} & \multicolumn{1}{c|}{Prestation} & \multicolumn{1}{c|}{Montant} \\
             \hline
             '''
-        base = client['nature'] + str(subedition.annee_fin)[2:] + Outils.mois_string(subedition.mois_fin)
+        base = client['nature'] + str(subedition.annee_fin_general)[2:] + \
+               Outils.mois_string(subedition.mois_fin_general)
         if client['bonus'] > 0:
             poste = Latex.echappe_caracteres(subgeneraux.article_t_indice('2').texte_t_long)
             prestation = Latex.echappe_caracteres(subgeneraux.articles[0].intitule_long)

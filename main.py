@@ -59,8 +59,8 @@ if Outils.existe(chemin_force):
     force = Force(dossier_source)
 
 dossier_bilans = subgeneraux.lecture
-mois = subedition.mois_debut
-annee = subedition.annee_debut
+mois = subedition.mois_debut_general
+annee = subedition.annee_debut_general
 bilans = []
 while 1:
     fichier_complet = "bilan-comptes_" + str(annee) + "_" + Outils.mois_string(mois) + ".csv"
@@ -73,7 +73,7 @@ while 1:
     dossier_source_bilan = DossierSource(Outils.chemin([dossier_bilans, annee, Outils.mois_string(mois)], plateforme))
     bilans.append(Bilan(dossier_source_bilan, fichier_complet, annee, mois))
 
-    if mois == subedition.mois_fin and annee == subedition.annee_fin:
+    if mois == subedition.mois_fin_general and annee == subedition.annee_fin_general:
         break
     if mois < 12:
         mois += 1

@@ -23,22 +23,51 @@ class SubEdition(object):
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : " + SubEdition.nom_fichier)
 
-        num = 3
+        num = 5
         if len(donnees_csv) != num:
             Outils.fatal(ErreurConsistance(),
                          SubEdition.libelle + ": nombre de lignes incorrect : " +
                          str(len(donnees_csv)) + ", attendu : " + str(num))
-        if len(donnees_csv[0]) != 3 and len(donnees_csv[1]) != 3:
+        if len(donnees_csv[0]) != 3 or len(donnees_csv[1]) != 3 or len(donnees_csv[2]) != 3 or len(donnees_csv[3]) != 3:
             Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": nombre de colonnes incorrect")
         try:
-            self.annee_debut = int(donnees_csv[0][1])
-            self.mois_debut = int(donnees_csv[0][2])
-            self.annee_fin = int(donnees_csv[1][1])
-            self.mois_fin = int(donnees_csv[1][2])
+            self.annee_debut_bonus = int(donnees_csv[0][1])
+            self.mois_debut_bonus = int(donnees_csv[0][2])
+            self.annee_fin_bonus = int(donnees_csv[1][1])
+            self.mois_fin_bonus = int(donnees_csv[1][2])
+
+            self.annee_debut_subs = int(donnees_csv[2][1])
+            self.mois_debut_subs = int(donnees_csv[2][2])
+            self.annee_fin_subs = int(donnees_csv[3][1])
+            self.mois_fin_subs = int(donnees_csv[3][2])
         except ValueError as e:
             Outils.fatal(e, SubEdition.libelle + "\nles mois et les années doivent être des nombres entiers")
 
-        if self.annee_debut > self.annee_fin or self.annee_debut == self.annee_fin and self.mois_debut > self.mois_fin:
-            Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin ne peut être avant le début")
+        if self.annee_debut_bonus > self.annee_fin_bonus or \
+                                self.annee_debut_bonus == self.annee_fin_bonus and \
+                                self.mois_debut_bonus > self.mois_fin_bonus:
+            Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin du bonus ne peut être avant le début")
+        if self.annee_debut_subs > self.annee_fin_subs or \
+                                self.annee_debut_subs == self.annee_fin_subs and \
+                                self.mois_debut_subs > self.mois_fin_subs:
+            Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin des subsides ne peut être avant le début")
 
-        self.filigrane = donnees_csv[2][1]
+        if self.annee_debut_bonus < self.annee_debut_subs or \
+                                self.annee_debut_bonus == self.annee_debut_subs and \
+                                self.mois_debut_bonus < self.mois_debut_subs:
+            self.annee_debut_general = self.annee_debut_bonus
+            self.mois_debut_general = self.mois_debut_bonus
+        else:
+            self.annee_debut_general = self.annee_debut_subs
+            self.mois_debut_general = self.mois_debut_subs
+
+        if self.annee_fin_bonus > self.annee_fin_subs or \
+                                self.annee_fin_bonus == self.annee_fin_subs and \
+                                self.mois_fin_bonus > self.mois_fin_subs:
+            self.annee_fin_general = self.annee_fin_bonus
+            self.mois_fin_general = self.mois_fin_bonus
+        else:
+            self.annee_fin_general = self.annee_fin_subs
+            self.mois_fin_general = self.mois_fin_subs
+
+        self.filigrane = donnees_csv[4][1]

@@ -138,23 +138,35 @@ class Consolidation(object):
             for co, compte in client['comptes'].items():
                 compte['mat'] = 0
                 compte['mot'] = 0
+                compte['mat_p'] = 0
+                compte['mot_p'] = 0
+                compte['ma_mois'] = submachines.donnees[compte['id_sub']]['ma_mois']
+                compte['mo_mois'] = submachines.donnees[compte['id_sub']]['mo_mois']
+                compte['ma_compte'] = submachines.donnees[compte['id_sub']]['ma_compte']
+                compte['mo_compte'] = submachines.donnees[compte['id_sub']]['mo_compte']
                 for d3 in subgeneraux.codes_d3():
                     compte[d3 + 't'] = 0
+                    compte[d3 + 't_p'] = 0
+                    compte[d3 + '_mois'] = subprestations.donnees[compte['id_sub']+d3]['max_mois']
+                    compte[d3 + '_compte'] = subprestations.donnees[compte['id_sub']+d3]['max_compte']
                 for a, annee in compte['annees'].items():
                     for m, mois in annee['mois'].items():
                         compte['mat'] += mois['maj']
                         compte['mot'] += mois['moj']
+                        compte['mat_p'] += min(mois['maj'], compte['ma_mois'])
+                        compte['mot_p'] += min(mois['moj'], compte['mo_mois'])
                         for d3 in subgeneraux.codes_d3():
                             compte[d3 + 't'] += mois[d3 + 'j']
-                compte['s-mat'] = min(compte['mat'], submachines.donnees[compte['id_sub']]['max_ma'])
-                compte['s-mot'] = min(compte['mot'], submachines.donnees[compte['id_sub']]['max_mo'])
+                            compte[d3 + 't_p'] += min(mois[d3 + 'j'], compte[d3 + '_mois'])
+                compte['s-mat'] = min(compte['mat_p'], compte['ma_compte'])
+                compte['s-mot'] = min(compte['mot_p'], compte['mo_compte'])
                 compte['subs'] = compte['s-mat'] + compte['s-mot']
                 if compte['t3'] not in client['codes']:
                     client['codes'][compte['t3']] = {'sm': 0}
                 client_t3 = client['codes'][compte['t3']]
                 client_t3['sm'] += compte['s-mat'] + compte['s-mot']
                 for d3 in subgeneraux.codes_d3():
-                    compte['s-' + d3 + 't'] = min(compte[d3 + 't'], subprestations.donnees[compte['id_sub']+d3]['max'])
+                    compte['s-' + d3 + 't'] = min(compte[d3 + 't_p'], compte[d3 + '_compte'])
                     compte['subs'] += compte['s-' + d3 + 't']
                     client['subs_' + d3 + 't'] += compte['s-' + d3 + 't']
                     if ('s' + d3) not in client_t3:
