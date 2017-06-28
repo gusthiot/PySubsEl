@@ -154,7 +154,8 @@ class Annexes(object):
                     \hline
                     \multicolumn{%(taille)s}{|c|}{%(numero)s - %(intitule)s - %(type)s} \\*
                     \hline
-                    Année & \multicolumn{1}{c|}{Mois} & \multicolumn{1}{c|}{Machine} & \multicolumn{1}{c|}{M.O. op.} 
+                    Année & Mois & \multicolumn{1}{c|}{Machine} & 
+                    \multicolumn{1}{c|}{M.O. op.} 
                       ''' % dico_detail_compte
 
                 for article in subgeneraux.articles_d3:
@@ -282,10 +283,10 @@ class Annexes(object):
         # ## 2
 
         if client['bonus'] > 0:
-            structure_bonus = r'''{|c|r|l|r|}'''
+            structure_bonus = r'''{|c|c|l|r|}'''
             contenu_bonus = r'''
                 \hline
-                Année & \multicolumn{1}{c|}{Mois} & \multicolumn{1}{c|}{Code} & \multicolumn{1}{c|}{Montant} \\
+                Année & Mois & \multicolumn{1}{c|}{Code} & \multicolumn{1}{c|}{Montant} \\
                 \hline
                 '''
 
@@ -311,6 +312,7 @@ class Annexes(object):
             contenu += Latex.tableau_vide(r'''Table 2 vide : Pas de bonus d'utilisation en heures creuses''')
 
         if client['subs'] > 0:
+
             # ## 3
 
             structure_recap = r'''{|r|l|l|l|l|r|}'''
@@ -330,13 +332,9 @@ class Annexes(object):
 
             contenu += Latex.tableau(contenu_recap, structure_recap, legende_recap)
 
-            contenu += r'''
-                \clearpage
-                '''
-
             # ## 4
 
-            structure_detail = r'''{|c|r|r|r|'''
+            structure_detail = r'''{|>{\centering}p{1.5cm}|c|r|r|'''
             for i in range(taille_d3):
                 structure_detail += r'''r|'''
             structure_detail += r'''}'''
