@@ -85,8 +85,8 @@ verification = Verification()
 consolidation = Consolidation()
 if verification.verification_date(bilans) > 0:
     sys.exit("Erreur dans les dates")
-if verification.verification_coherence(subgeneraux, subcomptes, submachines, subprestations, bilans, consolidation,
-                                       force) > 0:
+if verification.verification_coherence(subgeneraux, subedition, subcomptes, submachines, subprestations, bilans,
+                                       consolidation, force) > 0:
     sys.exit("Erreur dans la cohérence")
 
 consolidation.calcul_sommes(subgeneraux, submachines, subprestations)

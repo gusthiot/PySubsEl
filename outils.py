@@ -264,3 +264,22 @@ class Outils(object):
             return fl_d, ""
         except ValueError:
             return 0, colonne + " de la ligne " + str(ligne) + " doit être un nombre\n"
+
+    @staticmethod
+    def comparaison_date(annee_1, mois_1, annee_2, mois_2):
+        """
+        compare 2 dates pour savoir la plus récente
+        :param annee_1: année date 1
+        :param mois_1:  mois date 1
+        :param annee_2: année date 2
+        :param mois_2: mois date 2
+        :return: 1 si date 1 plus récente, 0 si même date, -1 si date 1 plus ancienne
+        """
+        date_1 = annee_1 * 100 + mois_1
+        date_2 = annee_2 * 100 + mois_2
+        if date_1 > date_2:
+            return 1
+        elif date_1 == date_2:
+            return 0
+        else:
+            return -1

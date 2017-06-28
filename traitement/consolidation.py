@@ -11,12 +11,13 @@ class Consolidation(object):
         self.clients = {}
         self.a_verifier = 1
 
-    def coherence_bilans(self, bilans, subcomptes, subgeneraux, force):
+    def coherence_bilans(self, bilans, subcomptes, subgeneraux, subedition, force):
         """
         vérifie que les données importées dans les bilan soit cohérentes, et construit la base consolidée
         :param bilans: bilans importés
         :param subcomptes: comptes subsides importés
         :param subgeneraux: paramètres généraux
+        :param subedition: paramètres d'édition
         :param force: comptes forcés importés
         :return: > 0 s'il y a une erreur, 0 sinon
         """
@@ -24,6 +25,16 @@ class Consolidation(object):
         coherence_comptes = 0
 
         for bilan in reversed(bilans):
+            d_bon = Outils.comparaison_date(bilan.annee, bilan.mois,
+                                            subedition.annee_debut_bonus, subedition.mois_debut_bonus)
+            f_bon = Outils.comparaison_date(bilan.annee, bilan.mois,
+                                            subedition.annee_fin_bonus, subedition.mois_fin_bonus)
+            ok_bon = not d_bon < 0 and not f_bon > 0
+            d_sub = Outils.comparaison_date(bilan.annee, bilan.mois,
+                                            subedition.annee_debut_subs, subedition.mois_debut_subs)
+            f_sub = Outils.comparaison_date(bilan.annee, bilan.mois,
+                                            subedition.annee_fin_subs, subedition.mois_fin_subs)
+            ok_sub = not d_sub < 0 and not f_sub > 0
             for donnee in bilan.donnees:
                 client = donnee[bilan.cles['code client']]
                 sap = donnee[bilan.cles['code client sap']]
@@ -49,9 +60,12 @@ class Consolidation(object):
                     else:
                         type_compte = donnee[bilan.cles['code type compte']]
                     if client not in self.clients:
-                        annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
-                        self.clients[client] = {'comptes': {}, 'nature': nature, 'type': ctype, 'abrev': abrev, 'sap': sap,
-                                                'coherent': True, 'nom': nom, 'annees': annees}
+                        annees = {}
+                        if ok_bon:
+                            annees[bilan.annee] = {'mois': {bilan.mois: mois}}
+
+                        self.clients[client] = {'comptes': {}, 'nature': nature, 'type': ctype, 'abrev': abrev,
+                                                'sap': sap, 'coherent': True, 'nom': nom, 'annees': annees}
                     else:
                         if nature != self.clients[client]['nature']:
                             self.clients[client]['coherent'] = False
@@ -59,13 +73,14 @@ class Consolidation(object):
                         if ctype != self.clients[client]['type']:
                             self.clients[client]['coherent'] = False
                             coherence_clients += 1
-                        if bilan.annee in self.clients[client]['annees']:
-                            if bilan.mois in self.clients[client]['annees'][bilan.annee]['mois']:
-                                self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois]['bj'] += bj
+                        if ok_bon:
+                            if bilan.annee in self.clients[client]['annees']:
+                                if bilan.mois in self.clients[client]['annees'][bilan.annee]['mois']:
+                                    self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois]['bj'] += bj
+                                else:
+                                    self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois] = mois
                             else:
-                                self.clients[client]['annees'][bilan.annee]['mois'][bilan.mois] = mois
-                        else:
-                            self.clients[client]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
+                                self.clients[client]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
                     comptes = self.clients[client]['comptes']
                     id_sub = subcomptes.obtenir_id(nature, type_compte)
                     if id_sub:
@@ -84,21 +99,25 @@ class Consolidation(object):
                                 return 1
                             mois[d3 + 'j'] = j
                         if num_compte not in comptes:
-                            annees = {bilan.annee: {'mois': {bilan.mois: mois}}}
+                            annees = {}
+                            if ok_sub:
+                                annees[bilan.annee] = {'mois': {bilan.mois: mois}}
                             code_t3 = subcomptes.donnees[id_sub]['type_subside']
                             type_s = subgeneraux.article_t(code_t3).texte_t_court
                             comptes[num_compte] = {'id_sub': id_sub, 'id_compte': id_compte, 'intitule': intitule,
-                                                   'type_p': subcomptes.donnees[id_sub]['intitule'], 'type': type_compte,
-                                                   'type_s': type_s, 't3': code_t3, 'coherent': True, 'annees': annees}
+                                                   'type_p': subcomptes.donnees[id_sub]['intitule'],
+                                                   'type': type_compte, 'type_s': type_s, 't3': code_t3,
+                                                   'coherent': True, 'annees': annees}
                         else:
                             if id_sub != comptes[num_compte]['id_sub']:
                                 print(comptes[num_compte]['id_compte'], id_sub, comptes[num_compte]['id_sub'])
                                 comptes[num_compte]['coherent'] = False
                                 coherence_comptes += 1
-                            if bilan.annee in comptes[num_compte]['annees']:
-                                comptes[num_compte]['annees'][bilan.annee]['mois'][bilan.mois] = mois
-                            else:
-                                comptes[num_compte]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
+                            if ok_sub:
+                                if bilan.annee in comptes[num_compte]['annees']:
+                                    comptes[num_compte]['annees'][bilan.annee]['mois'][bilan.mois] = mois
+                                else:
+                                    comptes[num_compte]['annees'][bilan.annee] = {'mois': {bilan.mois: mois}}
 
         if coherence_clients > 0:
             msg = "Les clients suivants ne sont pas homogènes sur la période, " \
@@ -114,7 +133,8 @@ class Consolidation(object):
             for k, v in self.clients.items():
                 for l, w in v['comptes'].items():
                     if not w['coherent']:
-                        msg += " - " + k + "/" + v['abrev'] + "/" + w['id_compte'] + "/" + l + "/" + w['intitule'] + "\n"
+                        msg += " - " + k + "/" + v['abrev'] + "/" + w['id_compte'] + "/" + l + "/" + \
+                               w['intitule'] + "\n"
             Outils.affiche_message(msg)
 
         reponse = coherence_clients + coherence_comptes

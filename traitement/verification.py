@@ -22,11 +22,12 @@ class Verification(object):
         self.a_verifier = 1
         return verif
 
-    def verification_coherence(self, subgeneraux, subcomptes, submachines, subprestations, bilans, consolidation,
-                               force):
+    def verification_coherence(self, subgeneraux, subedition, subcomptes, submachines, subprestations, bilans,
+                               consolidation, force):
         """
         vérifie la cohérence des données importées
         :param subgeneraux: paramètres généraux
+        :param subedition: paramètres d'édition
         :param subcomptes: comptes subsides importés
         :param submachines: plafonds machines importées
         :param subprestations: plafonds prestations importées
@@ -40,7 +41,6 @@ class Verification(object):
         verif += subcomptes.est_coherent(subgeneraux)
         verif += submachines.est_coherent(subcomptes)
         verif += subprestations.est_coherent(subgeneraux, subcomptes)
-        verif += consolidation.coherence_bilans(bilans, subcomptes, subgeneraux, force)
+        verif += consolidation.coherence_bilans(bilans, subcomptes, subgeneraux, subedition, force)
         self.a_verifier = 0
         return verif
-

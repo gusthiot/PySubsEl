@@ -43,27 +43,23 @@ class SubEdition(object):
         except ValueError as e:
             Outils.fatal(e, SubEdition.libelle + "\nles mois et les années doivent être des nombres entiers")
 
-        if self.annee_debut_bonus > self.annee_fin_bonus or \
-                                self.annee_debut_bonus == self.annee_fin_bonus and \
-                                self.mois_debut_bonus > self.mois_fin_bonus:
+        if Outils.comparaison_date(self.annee_debut_bonus, self.mois_debut_bonus,
+                                   self.annee_fin_bonus, self.mois_fin_bonus) > 0:
             Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin du bonus ne peut être avant le début")
-        if self.annee_debut_subs > self.annee_fin_subs or \
-                                self.annee_debut_subs == self.annee_fin_subs and \
-                                self.mois_debut_subs > self.mois_fin_subs:
+        if Outils.comparaison_date(self.annee_debut_subs, self.mois_debut_subs,
+                                   self.annee_fin_subs, self.mois_fin_subs) > 0:
             Outils.fatal(ErreurConsistance(), SubEdition.libelle + ": la fin des subsides ne peut être avant le début")
 
-        if self.annee_debut_bonus < self.annee_debut_subs or \
-                                self.annee_debut_bonus == self.annee_debut_subs and \
-                                self.mois_debut_bonus < self.mois_debut_subs:
+        if Outils.comparaison_date(self.annee_debut_bonus, self.mois_debut_bonus,
+                                   self.annee_debut_subs, self.mois_debut_subs) < 0:
             self.annee_debut_general = self.annee_debut_bonus
             self.mois_debut_general = self.mois_debut_bonus
         else:
             self.annee_debut_general = self.annee_debut_subs
             self.mois_debut_general = self.mois_debut_subs
 
-        if self.annee_fin_bonus > self.annee_fin_subs or \
-                                self.annee_fin_bonus == self.annee_fin_subs and \
-                                self.mois_fin_bonus > self.mois_fin_subs:
+        if Outils.comparaison_date(self.annee_fin_bonus, self.mois_fin_bonus,
+                                   self.annee_fin_subs, self.mois_fin_subs) > 0:
             self.annee_fin_general = self.annee_fin_bonus
             self.mois_fin_general = self.mois_fin_bonus
         else:
